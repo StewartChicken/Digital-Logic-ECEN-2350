@@ -1,0 +1,82 @@
+`timescale 1ns / 1ps
+
+module audio(
+    input mclk,
+    input [3:0] btn,
+    input [15:0] sw,
+    output reg left_audio_out, right_audio_out,
+    output [15:0] led,
+    output [3:0] D0_a, D1_a
+    );
+    
+    localparam MEM_SIZE = 250000;
+    reg [7:0] memory[MEM_SIZE-1:0];
+    
+    initial begin
+        $readmemh("C:/Users/stewa/Desktop/Lab 12/useless.hex", memory);
+    end
+    
+    reg [5:0] count;
+    reg [7:0] pwm_count;// 0-255
+    reg [18:0] address;  // Current address we are reading our sample from in memory
+    reg [7:0] sample;    // Current (8-bit) sample
+    reg [7:0] sub_count;    // 0-6
+    
+    
+    reg [15:0] led_reg;
+    reg pause;
+    
+    reg rewind;
+    
+    always @(posedge mclk) begin
+    
+        rewind <= sw[0];
+        
+        if(pause) begin
+            
+            if (count == 8) begin
+                count <= 0;
+                // This happens ~2MHz
+                pwm_count <= pwm_count + 1;
+                
+                // Read sample from memory
+                sample <= memory[address];
+                left_audio_out <= (pwm_count <= sample);
+                right_audio_out <= (pwm_count <= sample);
+            
+                // Increment address when we finish playing a sample
+            
+                if (pwm_count == 255) begin
+                    //sub_count <= sub_count + 1;
+                    //if (sub_count == 1) begin
+                    //    sub_count <= 0;
+                        // ~8KHz
+                        if(!rewind) begin
+                            if (address == (MEM_SIZE-1)) address <= 0;
+                            else address <= address + 1;
+                        end else begin
+                            if (address == 0) address <= (MEM_SIZE-1);
+                            else address <= address - 1;
+                        end
+                    //end
+                end
+           
+           
+            end else count <= count + 1;
+            
+            led_reg <= 16'b0000000000000000;
+            
+        end else begin
+            led_reg <= 16'b1111111111111111;
+        end
+    end
+    
+    always @(posedge btn[0]) begin
+        pause <= !pause;
+    end
+    
+    assign led = led_reg;
+    
+    assign D0_a = 4'b1111;
+    assign D1_a = 4'b1111;
+endmodule

@@ -1,0 +1,5 @@
+In order to run, the program needs to access the 'useless.hex' file. 
+I am not sure where you will store the file within your computer, so you will need to adjust the file path that the program reads from.
+Modify the "$readmemh("C:/Users/stewa/Desktop/Lab 12/useless.hex", memory);" line in the code.
+
+This lab extends the audio player that was demonstrated in class by adding a pause button (btn[0]) and a reverse audio switch (right-most switch).

@@ -1,0 +1,1 @@
+This file creates a 32 bit modular priority encoder in verilog. It includes both a test bench and a design file, both of which were written useing EDA Playground. The encoder is modular, meaning that it is composed of smaller 16 bit priority encoders which themselves are composed of yet smaller 8 bit priority encoders. 

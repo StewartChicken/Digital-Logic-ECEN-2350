@@ -1,0 +1,63 @@
+//This verilog was programmed to a boolean board and allowed the 7-segment display to be
+//programmed via the on-board switches. The four right-most switches were used
+//to program a hex value onto the right most 7-segment led.
+
+`timescale 1ns / 1ps
+
+module lab7(
+        
+        //switches on board
+        input [15:0] sw,
+        output [7:0] D0_seg, D1_seg,
+        output [3:0] D0_a, D1_a
+
+);
+    
+    //Decoders which determine which lights are on
+    //Entire lights are turned on when pulled low
+    assign D1_a = 4'b1110;
+    
+    //Values of the light segments
+    assign D0_seg = 8'b10111111;
+    
+    hexEncode en(sw[3:0], D1_seg);
+    
+    assign D0_a = sw[3]? 4'b1110 : 4'b1111;
+    
+ endmodule
+ 
+ //3 bit hex encoder
+ module hexEncode(input [3:0] bin, output [7:0] hex);
+  
+  wire [3:0] negation;
+  
+  negate n1(bin, negation);
+  
+   assign hex = (bin[3] & negation[2:0]==4'b000)? 8'h00 : 
+     			
+     			(bin[3] & negation[2:0]==4'b001)? 8'hF9 : 
+        
+        (bin[3] & negation[2:0]==4'b010)? 8'hA4 : (bin[3] & negation[2:0]==4'b011)? 8'hB0 : 
+        
+     	(bin[3] & negation[2:0]==4'b100)? 8'h99 : (bin[3] & negation[2:0]==4'b101)? 8'h92 : 
+        
+     (bin[3] & negation[2:0]==4'b110)? 8'h82 : (bin[3] & negation[2:0]==4'b111)? 8'hF8 :			
+     	(bin[2:0]==4'b000)? 8'hC0 : 
+     
+     	(bin[2:0]==4'b001)? 8'hF9 : 
+        
+        (bin[2:0]==4'b010)? 8'hA4 : (bin[2:0]==4'b011)? 8'hB0 : 
+        
+        (bin[2:0]==4'b100)? 8'h99 : (bin[2:0]==4'b101)? 8'h92 : 
+        
+        (bin[2:0]==4'b110)? 8'h82 : 8'hF8;
+   
+endmodule
+
+module negate(input [3:0] in, output [3:0] out);
+  
+  assign out[3:0] = ~in[3:0] + 1;
+  
+endmodule
+    
+    
